@@ -67,6 +67,8 @@ class Client
     if self.respond_to?(command)
       begin
         self.send(command, elts)
+      rescue ArgumentError => ae
+        puts ae.message
       rescue => e
         puts '-' * 80
         p e
@@ -211,8 +213,30 @@ class Client
     end
   end
 
+  # Hidden dev command: reloads the client
+  #
+  def command_rel(elts)
+
+    load(__FILE__)
+  end
+
+  def h_cancel; 'cancels a workflow instance'; end
+
+  def command_cancel(elts)
+
+    if wfid = elts.first
+      @dboard.cancel(wfid)
+    else
+      puts 'please pass a workflow instance id (wfid)'
+    end
+  end
+
   def raise_unless_workitem
-    raise 'no workitems selected' unless @workitem
+
+    raise ArgumentError.new(
+      'please select a workitem with the "workitems" and ' +
+      '"workitem" commands first'
+    ) unless @workitem
   end
 end
 
