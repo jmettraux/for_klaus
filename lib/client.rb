@@ -78,25 +78,25 @@ class Client
     end
   end
 
-  def help_help; 'lists this help'; end
+  def h_help; 'lists this help'; end
 
   def command_help(elts)
 
-    methods.map(&:to_s).select { |m| m.match(/^help_/) }.each do |h|
-      c = h[5..-1]
-      h = self.send("help_#{c}")
+    methods.map(&:to_s).select { |m| m.match(/^h_/) }.sort.each do |hm|
+      c = hm[2..-1]
+      h = self.send(hm)
       printf("%14s: %s\n" % [ c, h ])
     end
   end
 
-  def help_exit; 'exits this client'; end
+  def h_exit; 'exits this client'; end
 
   def command_exit(elts)
 
     exit(0)
   end
 
-  def help_launch; 'launches the workflow in defs/def0.rb'; end
+  def h_launch; 'launches the workflow in defs/def0.rb'; end
 
   def command_launch(elts)
 
@@ -104,7 +104,7 @@ class Client
     puts "launched process instance #{wfid}"
   end
 
-  def help_ps; 'lists the currently running process instances'; end
+  def h_ps; 'lists the currently running process instances'; end
 
   def command_ps(elts)
 
@@ -126,14 +126,7 @@ class Client
     puts "processes: #{processes.size}"
   end
 
-  # hidden command: reload self, for faster development...
-  #
-  def command_reload(elts)
-
-    load(__FILE__)
-  end
-
-  def help_workitems; 'lists the workitems available for the current user'; end
+  def h_workitems; 'lists the workitems available for the current user'; end
 
   def command_workitems(elts)
 
@@ -160,7 +153,7 @@ class Client
     puts "workitems: #{workitems.size}"
   end
 
-  def help_workitem; 'select workitem n (from list of workitems)'; end
+  def h_workitem; 'select workitem n (from list of workitems)'; end
 
   def command_workitem(elts)
 
@@ -173,7 +166,7 @@ class Client
     end
   end
 
-  def help_proceed; 'proceeds the current workitem'; end
+  def h_proceed; 'proceeds the current workitem'; end
 
   def command_proceed(elts)
 
@@ -184,7 +177,7 @@ class Client
     @workitem = nil
   end
 
-  def help_notes; 'print notes in current workitem'; end
+  def h_notes; 'print notes in current workitem'; end
 
   def command_notes(elts)
 
@@ -193,7 +186,7 @@ class Client
     pp @workitem.fields['notes']
   end
 
-  def help_note; 'take a "note" in the current workitem'; end
+  def h_note; 'take a "note" in the current workitem'; end
 
   def command_note(elts)
 
@@ -205,6 +198,17 @@ class Client
 
     @workitem = @dboard.storage_participant[@workitem.fei]
       # reload workitem
+  end
+
+  def h_user; 'change the current user'; end
+
+  def command_user(elts)
+
+    if u = elts.first
+      @user = u
+    else
+      puts 'please pass a username'
+    end
   end
 
   def raise_unless_workitem
